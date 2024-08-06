@@ -10,11 +10,13 @@ PartyUp uses slash commands for interaction, providing a simple and intuitive in
 
 Here are the commands available to all users:
 
-- `/party create <role-id> <size>`: This command allows you to create a new party for a specific role. 
+- `/party create <role-id> <size>`: This command allows you to create a new party for a specific role.
+
   - `role-id`: ID of the role of the party you want to create. This should be a role that starts with the LFG prefix.
   - `size`: Size of the party you want to create. This is the number of members you want in the party.
 
-- `/party adjust <role-id> <size>`: This command allows you to adjust the size of an existing party for a specific role. 
+- `/party adjust <role-id> <size>`: This command allows you to adjust the size of an existing party for a specific role.
+
   - `role-id`: ID of the role of the party you want to adjust. This should be a role that starts with the LFG prefix.
   - `size`: New size of the party. This should be greater than or equal to the current number of players in the party.
 
@@ -22,14 +24,15 @@ Here are the commands available to all users:
 
 Here are the commands available to admins:
 
-- `/party list <role-id>`: This command allows you to list all the parties for a specific role. 
-  - `role-id`: ID of the role of the parties you want to list. This should be a role that starts with the LFG prefix.
+- `/party list`: This command allows you to list all the parties that have been created
 
-- `/party kick <role-id> <member>`: This command allows you to kick a user from an existing party for a specific role. 
+- `/party kick <role-id> <member>`: This command allows you to kick a user from an existing party for a specific role.
+
   - `role-id`: ID of the role of the party. This should be a role that starts with the LFG prefix.
   - `<member>`: Username of the member you wish to kick.
 
-- `/party remove <role-id>`: This command allows you to remove an existing party for a specific role. 
+- `/party remove <role-id>`: This command allows you to remove an existing party for a specific role.
+
   - `role-id`: ID of the role of the party you want to remove. This should be a role that starts with the LFG prefix.
 
 ## Development

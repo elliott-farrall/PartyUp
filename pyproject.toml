@@ -2,13 +2,19 @@
 name = "PartyUp"
 version = "1.0.0"
 description = "A Discord bot for creating parties and queues."
+license = "MIT"
 authors = ["ElliottSullingeFarrall <elliott.chalford@gmail.com>"]
 readme = "README.md"
+repository = "https://github.com/ElliottSullingeFarrall/PartyUp"
+packages = [{ include = "src", to = "PartyUp" }]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 python-dotenv = "^1.0.1"
 py-cord = "^2.5.0"
+
+[tool.poetry.scripts]
+PartyUp = "src:run"
 
 [build-system]
 requires = ["poetry-core"]
