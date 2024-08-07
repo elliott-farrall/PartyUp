@@ -1,12 +1,21 @@
+from typing import List, Optional
+
 from discord import (
-    ButtonStyle, Colour, Embed, Interaction, Role, TextChannel, User,
+    Button, ButtonStyle, Colour, Embed, Interaction, Member, Message, Role,
+    TextChannel, User,
 )
 from discord.ext import tasks
-from discord.ui import Button, View, button
+from discord.ui import View, button
 
 
 class Party:
-    def __init__(self, channel: TextChannel, creator: User, role: Role, size: int):
+    list: List['Party'] = []
+
+    @classmethod
+    def get(cls, role: Role) -> Optional['Party']:
+        return next((party for party in cls.list if party.role == role), None)
+
+    def __init__(self, channel: TextChannel, creator: Member | User, role: Role, size: int):
         self.creator = creator
         self.channel = channel
         self.category = channel.category
@@ -16,9 +25,13 @@ class Party:
 
         self.players = {creator}
 
+        Party.list.append(self)
+
+        self.message: Optional[Message] = None
         self.updater.start()
 
     def __del__(self) -> None:
+        Party.list.remove(self)
         self.updater.cancel()
         del self
 
@@ -30,17 +43,17 @@ class Party:
     def is_full(self) -> bool:
         return len(self.players) == self.size
 
-    def add(self, player: User) -> None:
+    def add(self, player: Member | User) -> None:
         if not self.is_full:
             self.players.add(player)
 
-    def remove(self, player: User) -> None:
+    def remove(self, player: Member | User) -> None:
         if player in self.players:
             self.players.remove(player)
 
     @tasks.loop(minutes=5)
     async def updater(self) -> None:
-        if hasattr(self, "message"):
+        if self.message is not None:
             await self.message.delete()
 
         if self.is_empty:
@@ -49,6 +62,9 @@ class Party:
             self.message = await self.channel.send(
                 embed=self.msg_embed, view=self.msg_view
             )
+
+    def refresh(self) -> None:
+        self.updater.restart()
 
     @property
     def msg_embed(self) -> Embed:
@@ -80,8 +96,13 @@ class PartyBtn(View):
 
     @button(label="Join", style=ButtonStyle.green)
     async def join_button(self, button: Button, interaction: Interaction) -> None:
+        if interaction.user is None:
+            print("[!] User not found.")
+            return
+
         if interaction.user not in self.party.players:
             self.party.add(interaction.user)
+            self.party.updater.restart()
             await interaction.response.edit_message(
                 content=f"{interaction.user.mention} joined the party!",
                 embed=self.party.msg_embed,
@@ -96,8 +117,13 @@ class PartyBtn(View):
 
     @button(label="Leave", style=ButtonStyle.red)
     async def leave_button(self, button: Button, interaction: Interaction) -> None:
+        if interaction.user is None:
+            print("[!] User not found.")
+            return
+
         if interaction.user in self.party.players:
             self.party.remove(interaction.user)
+            self.party.updater.restart()
             await interaction.response.edit_message(
                 content=f"{interaction.user.mention} left the party!",
                 embed=self.party.msg_embed,
